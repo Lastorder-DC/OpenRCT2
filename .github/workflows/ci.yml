@@ -2,8 +2,6 @@ name: CI
 on: [push, pull_request]
 env:
   OPENRCT2_BUILD_SERVER: GitHub
-  OPENRCT2_ORG_TOKEN: ${{ secrets.OPENRCT2_ORG_TOKEN }}
-  BACKTRACE_IO_TOKEN: ${{ secrets.BACKTRACE_IO_TOKEN }}
   OPENRCT2_VERSION: 0.3.0
 jobs:
   lint-commit:
@@ -113,11 +111,7 @@ jobs:
       - name: Upload artifacts (openrct2.org)
         run: |
           . scripts/setenv
-          if [[ "$OPENRCT2_PUSH" == "true" ]]; then
-              upload-build artifacts/openrct2-macos.zip macos $OPENRCT2_VERSION $OPENRCT2_SHA1 $OPENRCT2_BRANCH
-          else
-              echo 'Not going to push build'
-          fi
+          echo 'Not going to push build'
   linux-portable:
     name: Linux (x64, portable)
     runs-on: ubuntu-latest
@@ -148,11 +142,7 @@ jobs:
         shell: bash
         run: |
           . scripts/setenv -q
-          if [[ "$OPENRCT2_PUSH" == "true" ]]; then
-              upload-build artifacts/OpenRCT2-Linux-x86_64.tar.gz linux-x86_64 $OPENRCT2_VERSION $OPENRCT2_SHA1 $OPENRCT2_BRANCH
-          else
-              echo 'Not going to push build'
-          fi
+          echo 'Not going to push build'
   linux-portable-32:
     name: Linux (i686, portable)
     runs-on: ubuntu-latest
@@ -188,11 +178,7 @@ jobs:
         shell: bash
         run: |
           . scripts/setenv -q
-          if [[ "$OPENRCT2_PUSH" == "true" ]]; then
-              upload-build artifacts/OpenRCT2-Linux-i686.tar.gz linux-i686 $OPENRCT2_VERSION $OPENRCT2_SHA1 $OPENRCT2_BRANCH
-          else
-              echo 'Not going to push build'
-          fi
+          echo 'Not going to push build'
   linux-appimage:
     name: Linux (x64, AppImage)
     runs-on: ubuntu-latest
@@ -233,12 +219,7 @@ jobs:
         run: |
           OPENRCT2_BRANCH=$(echo "$GITHUB_REF" | sed 's/refs\/heads\///')
           echo "Current branch is $OPENRCT2_BRANCH"
-          if [ "$OPENRCT2_BRANCH" = 'develop' ]; then
-                  docker login -u "$OPENRCT2_DOCKER_USER" -p "$OPENRCT2_DOCKER_PASS"
-                  docker push openrct2/openrct2-cli:develop
-          else
-                  echo 'Image not pushed'
-          fi
+          echo 'Image not pushed'
   linux-clang:
     name: Linux (Debug, [http, network, OpenGL] disabled) using clang
     runs-on: ubuntu-latest
@@ -278,8 +259,4 @@ jobs:
         shell: bash
         run: |
           . scripts/setenv -q
-          if [[ "$OPENRCT2_PUSH" == "true" ]]; then
-              upload-build artifacts/openrct2-arm.apk android-arm $OPENRCT2_VERSION $OPENRCT2_SHA1 $OPENRCT2_BRANCH
-          else
-              echo 'Not going to push build'
-          fi
+          echo 'Not going to push build'
