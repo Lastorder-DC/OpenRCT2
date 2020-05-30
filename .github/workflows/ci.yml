@@ -60,18 +60,6 @@ jobs:
       - name: Run Tests
         shell: bash
         run: . scripts/setenv -q && run-tests
-      - name: Upload artifacts (openrct2.org)
-        shell: bash
-        run: |
-          . scripts/setenv -q
-          if [[ "$OPENRCT2_PUSH" == "true" ]]; then
-              upload-build artifacts/openrct2-portable-*.zip "windows-portable-$PLATFORM" $OPENRCT2_VERSION $OPENRCT2_SHA1 $OPENRCT2_BRANCH
-              upload-build artifacts/openrct2-installer-*.exe "windows-installer-$PLATFORM" $OPENRCT2_VERSION $OPENRCT2_SHA1 $OPENRCT2_BRANCH
-              upload-build artifacts/openrct2-symbols-*.zip "windows-symbols-$PLATFORM" $OPENRCT2_VERSION $OPENRCT2_SHA1 $OPENRCT2_BRANCH
-              upload-backtrace-symbols artifacts/openrct2-symbols-*.zip
-          else
-              echo 'Not going to push build'
-          fi
   windows-mingw:
     name: Windows (win32) using mingw
     runs-on: ubuntu-latest
@@ -108,10 +96,6 @@ jobs:
         with:
           name: "OpenRCT2-macOS"
           path: artifacts/openrct2-macos.zip
-      - name: Upload artifacts (openrct2.org)
-        run: |
-          . scripts/setenv
-          echo 'Not going to push build'
   linux-portable:
     name: Linux (x64, portable)
     runs-on: ubuntu-latest
@@ -138,11 +122,6 @@ jobs:
       - name: Run Tests
         shell: bash
         run: . scripts/setenv -q && run-tests
-      - name: Upload artifacts (openrct2.org)
-        shell: bash
-        run: |
-          . scripts/setenv -q
-          echo 'Not going to push build'
   linux-portable-32:
     name: Linux (i686, portable)
     runs-on: ubuntu-latest
@@ -174,11 +153,6 @@ jobs:
       - name: Run testpaint
         shell: bash
         run: . scripts/setenv -q && run-testpaint
-      - name: Upload artifacts (openrct2.org)
-        shell: bash
-        run: |
-          . scripts/setenv -q
-          echo 'Not going to push build'
   linux-appimage:
     name: Linux (x64, AppImage)
     runs-on: ubuntu-latest
@@ -202,61 +176,3 @@ jobs:
         with:
           name: OpenRCT2-AppImage
           path: artifacts
-  linux-docker:
-    name: Linux (docker)
-    needs: [check-code-formatting]
-    if: github.repository == 'OpenRCT2/OpenRCT2'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build image
-        run: |
-          git clone --depth 1 https://github.com/OpenRCT2/openrct2-docker .
-          docker build -t openrct2/openrct2-cli:develop develop/cli
-      - name: Push image
-        env:
-          OPENRCT2_DOCKER_USER: ${{ secrets.OPENRCT2_DOCKER_USER }}
-          OPENRCT2_DOCKER_PASS: ${{ secrets.OPENRCT2_DOCKER_PASS }}
-        run: |
-          OPENRCT2_BRANCH=$(echo "$GITHUB_REF" | sed 's/refs\/heads\///')
-          echo "Current branch is $OPENRCT2_BRANCH"
-          echo 'Image not pushed'
-  linux-clang:
-    name: Linux (Debug, [http, network, OpenGL] disabled) using clang
-    runs-on: ubuntu-latest
-    needs: [check-code-formatting]
-    container:
-      image: openrct2/openrct2-build:0.2.4-bionic
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Build OpenRCT2
-        shell: bash
-        run: . scripts/setenv && build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DDISABLE_NETWORK=ON -DDISABLE_HTTP_TWITCH=ON -DDISABLE_OPENGL=ON
-  android:
-    name: Android
-    runs-on: ubuntu-latest
-    needs: [check-code-formatting]
-    container:
-      image: openrct2/openrct2-build:0.2.4-android
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Build OpenRCT2
-        shell: bash
-        run: |
-          . scripts/setenv
-          pushd src/openrct2-android
-            ./gradlew app:assemblePR
-          popd
-          mkdir -p artifacts
-          mv src/openrct2-android/app/build/outputs/apk/arm/pr/app-arm-pr.apk artifacts/openrct2-arm.apk
-      - name: Upload artifacts (CI)
-        uses: actions/upload-artifact@v1
-        with:
-          name: "OpenRCT2-Android"
-          path: artifacts
-      - name: Upload artifacts (openrct2.org)
-        shell: bash
-        run: |
-          . scripts/setenv -q
-          echo 'Not going to push build'
