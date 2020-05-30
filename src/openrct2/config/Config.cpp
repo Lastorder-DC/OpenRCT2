@@ -483,6 +483,34 @@ namespace Config
         writer->WriteBoolean("guest_died", model->guest_died);
     }
 
+    static void ReadTwitch(IIniReader* reader)
+    {
+        if (reader->ReadSection("twitch"))
+        {
+            auto model = &gConfigTwitch;
+            model->api_url = reader->GetCString("api_url", nullptr);
+            model->channel = reader->GetCString("channel", nullptr);
+            model->enable_follower_peep_names = reader->GetBoolean("follower_peep_names", true);
+            model->enable_follower_peep_tracking = reader->GetBoolean("follower_peep_tracking", false);
+            model->enable_chat_peep_names = reader->GetBoolean("chat_peep_names", true);
+            model->enable_chat_peep_tracking = reader->GetBoolean("chat_peep_tracking", true);
+            model->enable_news = reader->GetBoolean("news", false);
+        }
+    }
+
+    static void WriteTwitch(IIniWriter* writer)
+    {
+        auto model = &gConfigTwitch;
+        writer->WriteSection("twitch");
+        writer->WriteString("api_url", model->api_url);
+        writer->WriteString("channel", model->channel);
+        writer->WriteBoolean("follower_peep_names", model->enable_follower_peep_names);
+        writer->WriteBoolean("follower_peep_tracking", model->enable_follower_peep_tracking);
+        writer->WriteBoolean("chat_peep_names", model->enable_chat_peep_names);
+        writer->WriteBoolean("chat_peep_tracking", model->enable_chat_peep_tracking);
+        writer->WriteBoolean("news", model->enable_news);
+    }
+
     static void ReadFont(IIniReader* reader)
     {
         if (reader->ReadSection("font"))
@@ -551,6 +579,7 @@ namespace Config
             ReadSound(reader.get());
             ReadNetwork(reader.get());
             ReadNotifications(reader.get());
+            ReadTwitch(reader.get());
             ReadFont(reader.get());
             ReadPlugin(reader.get());
             return true;
@@ -572,6 +601,7 @@ namespace Config
             ReadSound(reader.get());
             ReadNetwork(reader.get());
             ReadNotifications(reader.get());
+            ReadTwitch(reader.get());
             ReadFont(reader.get());
             ReadPlugin(reader.get());
             return true;
@@ -596,6 +626,7 @@ namespace Config
             WriteSound(writer.get());
             WriteNetwork(writer.get());
             WriteNotifications(writer.get());
+            WriteTwitch(writer.get());
             WriteFont(writer.get());
             WritePlugin(writer.get());
             return true;
@@ -709,6 +740,7 @@ namespace Config
 GeneralConfiguration gConfigGeneral;
 InterfaceConfiguration gConfigInterface;
 SoundConfiguration gConfigSound;
+TwitchConfiguration gConfigTwitch;
 NetworkConfiguration gConfigNetwork;
 NotificationConfiguration gConfigNotifications;
 FontConfiguration gConfigFonts;
@@ -754,6 +786,8 @@ void config_release()
     SafeFree(gConfigInterface.current_theme_preset);
     SafeFree(gConfigInterface.current_title_sequence_preset);
     SafeFree(gConfigSound.device);
+    SafeFree(gConfigTwitch.api_url);
+    SafeFree(gConfigTwitch.channel);
     SafeFree(gConfigFonts.file_name);
     SafeFree(gConfigFonts.font_name);
 }

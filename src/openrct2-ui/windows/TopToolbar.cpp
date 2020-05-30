@@ -50,6 +50,7 @@
 #include <openrct2/interface/Chat.h>
 #include <openrct2/interface/InteractiveConsole.h>
 #include <openrct2/interface/Screenshot.h>
+#include <openrct2/network/Twitch.h>
 #include <openrct2/network/network.h>
 #include <openrct2/paint/VirtualFloor.h>
 #include <openrct2/peep/Staff.h>
@@ -122,7 +123,11 @@ enum FILE_MENU_DDIDX {
     DDIDX_QUIT_TO_MENU = 10,
     DDIDX_EXIT_OPENRCT2 = 11,
     // separator
+#ifdef DISABLE_TWITCH
     DDIDX_UPDATE_AVAILABLE = 13,
+#else
+    DDIDX_ENABLE_TWITCH = 13
+#endif
 };
 
 enum TOP_TOOLBAR_VIEW_MENU_DDIDX {
@@ -327,6 +332,7 @@ static money32 selection_raise_land(uint8_t flags);
 
 static ClearAction GetClearAction();
 
+static bool _menuDropdownIncludesTwitch;
 static bool _landToolBlocked;
 static uint8_t _unkF64F0E;
 static int16_t _unkF64F0A;
@@ -446,6 +452,7 @@ static void window_top_toolbar_mousedown(rct_window* w, rct_widgetindex widgetIn
     switch (widgetIndex)
     {
         case WIDX_FILE_MENU:
+            _menuDropdownIncludesTwitch = false;
             if (gScreenFlags & (SCREEN_FLAGS_TRACK_DESIGNER | SCREEN_FLAGS_TRACK_MANAGER))
             {
                 gDropdownItemsFormat[0] = STR_ABOUT;
@@ -490,16 +497,34 @@ static void window_top_toolbar_mousedown(rct_window* w, rct_widgetindex widgetIn
                 gDropdownItemsFormat[10] = STR_QUIT_TO_MENU;
                 gDropdownItemsFormat[11] = STR_EXIT_OPENRCT2;
                 numItems = 12;
+#ifdef DISABLE_TWITCH
                 if (OpenRCT2::GetContext()->HasNewVersionInfo())
                 {
                     gDropdownItemsFormat[12] = STR_EMPTY;
                     gDropdownItemsFormat[13] = STR_UPDATE_AVAILABLE;
                     numItems += 2;
                 }
+#else
+                if (gConfigTwitch.channel != nullptr && gConfigTwitch.channel[0] != 0)
+                {
+                    _menuDropdownIncludesTwitch = true;
+                    gDropdownItemsFormat[12] = STR_EMPTY;
+                    gDropdownItemsFormat[13] = STR_TOGGLE_OPTION;
+                    gDropdownItemsArgs[13] = STR_TWITCH_ENABLE;
+                    numItems += 2;
+                }
+#endif
             }
             window_dropdown_show_text(
                 { w->windowPos.x + widget->left, w->windowPos.y + widget->top }, widget->height() + 1, w->colours[0] | 0x80,
                 DROPDOWN_FLAG_STAY_OPEN, numItems);
+
+#ifndef DISABLE_TWITCH
+            if (_menuDropdownIncludesTwitch && gTwitchEnable)
+            {
+                dropdown_set_checked(DDIDX_ENABLE_TWITCH, true);
+            }
+#endif
             break;
         case WIDX_CHEATS:
             top_toolbar_init_cheats_menu(w, widget);
@@ -611,9 +636,15 @@ static void window_top_toolbar_dropdown(rct_window* w, rct_widgetindex widgetInd
                 case DDIDX_EXIT_OPENRCT2:
                     context_quit();
                     break;
+#ifdef DISABLE_TWITCH
                 case DDIDX_UPDATE_AVAILABLE:
                     context_open_window_view(WV_NEW_VERSION_INFO);
                     break;
+#else
+                case DDIDX_ENABLE_TWITCH:
+                    gTwitchEnable = !gTwitchEnable;
+                    break;
+#endif
             }
             break;
         case WIDX_CHEATS:
