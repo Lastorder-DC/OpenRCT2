@@ -1,7 +1,7 @@
 name: Auto rebase with upstream
 on:
   schedule:
-    - cron:  '0 4 * * *'
+    - cron:  '0 3 * * *'
 jobs:
   merge-localisation:
     name: Rebase with upstream(OpenRCT2/OpenRCT2)
