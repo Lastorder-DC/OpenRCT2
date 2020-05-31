@@ -1,4 +1,11 @@
-# OpenRCT2
+# About OpenRCT2 Twitch Fork
+This fork re-enable twitch integration function that removed from upstream PR [#11820](https://github.com/OpenRCT2/OpenRCT2/pull/11820).
+
+| CI Status | Update Status |
+|-----------|---------------|
+| ![CI](https://github.com/Lastorder-DC/OpenRCT2/workflows/CI/badge.svg?branch=enable%2Ftwitch) | ![Auto rebase with upstream](https://github.com/Lastorder-DC/OpenRCT2/workflows/Auto%20rebase%20with%20upstream/badge.svg) |
+
+# About OpenRCT2
 An open-source re-implementation of RollerCoaster Tycoon 2. A construction and management simulation video game that simulates amusement park management.
 
 ---
