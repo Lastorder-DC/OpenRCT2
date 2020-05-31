@@ -1,7 +1,7 @@
 name: Auto rebase with upstream
 on:
   schedule:
-    - cron:  '*/5 * * * *'
+    - cron:  '*/2 * * * *'
 jobs:
   rebase-upstream:
     name: Rebase with upstream(OpenRCT2/OpenRCT2)
@@ -37,7 +37,7 @@ jobs:
               exit 1
           else
               echo "Pushing changes..."
-              git push
+              git push --force
               echo "Complete"
           fi
           popd
