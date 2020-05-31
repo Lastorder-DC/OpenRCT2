@@ -1,0 +1,43 @@
+name: Auto rebase with upstream
+on:
+  schedule:
+    - cron:  '0 4 * * *'
+jobs:
+  merge-localisation:
+    name: Rebase with upstream(OpenRCT2/OpenRCT2)
+    if: github.repository == 'Lastorder-DC/OpenRCT2'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Store private SSH
+        run: |
+          echo "Store private SSH deploy key..."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOYKEY }}" > ~/.ssh/id_rsa
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/id_rsa
+      - name: Clone repository
+        run: |
+          echo "Cloning repository..."
+          git clone -b enable/twitch git@github.com:Lastorder-DC/OpenRCT2.git OpenRCT2
+      - name: Add and fetch upstream repository
+        run: |
+          pushd ./OpenRCT2
+          echo "Adding and fetching upstream repository..."
+          git remote add upstream https://github.com/OpenRCT2/OpenRCT2.git
+          git fetch upstream
+          popd
+      - name: Rebase and push
+        run: |
+          pushd ./OpenRCT2
+          git rebase upstream/develop
+          if [[ $(git status -s) ]]; then
+              echo "Possible conflict detected. cannot auto rebase."
+              exit 1
+          else
+              echo "Pushing changes..."
+              git config --global user.name "Lastorder-DC"
+              git config --global user.email "18280396+Lastorder-DC@users.noreply.github.com"
+              git push
+              echo "Complete"
+          fi
+          popd
