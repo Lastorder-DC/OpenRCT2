@@ -18,6 +18,8 @@ jobs:
       - name: Clone repository
         run: |
           echo "Cloning repository..."
+          git config --global user.name "Lastorder-DC"
+          git config --global user.email "18280396+Lastorder-DC@users.noreply.github.com"
           git clone -b enable/twitch git@github.com:Lastorder-DC/OpenRCT2.git OpenRCT2
       - name: Add and fetch upstream repository
         run: |
@@ -35,8 +37,6 @@ jobs:
               exit 1
           else
               echo "Pushing changes..."
-              git config --global user.name "Lastorder-DC"
-              git config --global user.email "18280396+Lastorder-DC@users.noreply.github.com"
               git push
               echo "Complete"
           fi
