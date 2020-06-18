@@ -36,6 +36,10 @@
 #define NETWORK_STREAM_VERSION "2"
 #define NETWORK_STREAM_ID OPENRCT2_VERSION "-" NETWORK_STREAM_VERSION
 
+// Append twitch to network version to prevent connection to regular server
+#undef NETWORK_STREAM_ID
+#define NETWORK_STREAM_ID OPENRCT2_VERSION "-" NETWORK_STREAM_VERSION "-twitch"
+
 static Peep* _pickup_peep = nullptr;
 static int32_t _pickup_peep_old_x = LOCATION_NULL;
 
