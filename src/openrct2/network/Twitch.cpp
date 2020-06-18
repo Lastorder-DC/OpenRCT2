@@ -386,14 +386,13 @@ namespace Twitch
     {
         // Check what followers are already in the park
         uint16_t spriteIndex;
-        Peep* peep;
-        FOR_ALL_GUESTS (spriteIndex, peep)
+        for (auto guest : EntityList<Guest>(SPRITE_LIST_PEEP))
         {
-            if (peep->Name != nullptr)
+            if (guest->Name != nullptr)
             {
                 uint8_t args[32]{};
                 char buffer[256]{};
-                peep->FormatNameTo(args);
+                guest->FormatNameTo(args);
                 format_string(buffer, sizeof(buffer), STR_STRINGID, args);
 
                 AudienceMember* member = nullptr;
@@ -407,21 +406,21 @@ namespace Twitch
                     }
                 }
 
-                if (peep->PeepFlags & PEEP_FLAGS_TWITCH)
+                if (guest->PeepFlags & PEEP_FLAGS_TWITCH)
                 {
                     if (member == nullptr)
                     {
                         // Member no longer peep name worthy
-                        uint32_t flags = peep->PeepFlags & ~(PEEP_FLAGS_TRACKING | PEEP_FLAGS_TWITCH);
+                        uint32_t flags = guest->PeepFlags & ~(PEEP_FLAGS_TRACKING | PEEP_FLAGS_TWITCH);
 
-                        auto guestSetFlagsAction = GuestSetFlagsAction(peep->sprite_index, flags);
+                        auto guestSetFlagsAction = GuestSetFlagsAction(guest->sprite_index, flags);
                         GameActions::Execute(&guestSetFlagsAction);
 
                         // TODO set peep name back to number / real name
                     }
                     else
                     {
-                        uint32_t flags = peep->PeepFlags;
+                        uint32_t flags = guest->PeepFlags;
                         if (member->ShouldTrack)
                         {
                             flags |= (PEEP_FLAGS_TRACKING);
@@ -430,22 +429,22 @@ namespace Twitch
                         {
                             flags &= ~(PEEP_FLAGS_TRACKING);
                         }
-                        if (flags != peep->PeepFlags)
+                        if (flags != guest->PeepFlags)
                         {
-                            auto guestSetFlagsAction = GuestSetFlagsAction(peep->sprite_index, flags);
+                            auto guestSetFlagsAction = GuestSetFlagsAction(guest->sprite_index, flags);
                             GameActions::Execute(&guestSetFlagsAction);
                         }
                     }
                 }
-                else if (member != nullptr && !(peep->PeepFlags & PEEP_FLAGS_LEAVING_PARK))
+                else if (member != nullptr && !(guest->PeepFlags & PEEP_FLAGS_LEAVING_PARK))
                 {
                     // Peep with same name already exists but not twitch
-                    uint32_t flags = peep->PeepFlags | PEEP_FLAGS_TWITCH;
+                    uint32_t flags = guest->PeepFlags | PEEP_FLAGS_TWITCH;
                     if (member->ShouldTrack)
                     {
                         flags |= PEEP_FLAGS_TRACKING;
                     }
-                    auto guestSetFlagsAction = GuestSetFlagsAction(peep->sprite_index, flags);
+                    auto guestSetFlagsAction = GuestSetFlagsAction(guest->sprite_index, flags);
                     GameActions::Execute(&guestSetFlagsAction);
                 }
             }
@@ -455,7 +454,7 @@ namespace Twitch
         if (!members.empty())
         {
             size_t memberIndex = SIZE_MAX;
-            FOR_ALL_GUESTS (spriteIndex, peep)
+            for (auto guest : EntityList<Guest>(SPRITE_LIST_PEEP))
             {
                 size_t originalMemberIndex = memberIndex;
                 for (size_t i = memberIndex + 1; i < members.size(); i++)
@@ -472,22 +471,22 @@ namespace Twitch
                 }
 
                 AudienceMember* member = &members[memberIndex];
-                if (peep->Name == nullptr && !(peep->PeepFlags & PEEP_FLAGS_LEAVING_PARK))
+                if (guest->Name == nullptr && !(guest->PeepFlags & PEEP_FLAGS_LEAVING_PARK))
                 {
                     // Rename peep and add flags
                     auto memLen = std::strlen(member->Name) + 1;
-                    peep->Name = static_cast<char*>(std::malloc(memLen));
-                    if (peep->Name != nullptr)
+                    guest->Name = static_cast<char*>(std::malloc(memLen));
+                    if (guest->Name != nullptr)
                     {
-                        std::memcpy(peep->Name, member->Name, memLen);
+                        std::memcpy(guest->Name, member->Name, memLen);
 
-                        uint32_t flags = peep->PeepFlags | PEEP_FLAGS_TWITCH;
+                        uint32_t flags = guest->PeepFlags | PEEP_FLAGS_TWITCH;
                         if (member->ShouldTrack)
                         {
                             flags |= PEEP_FLAGS_TRACKING;
                         }
 
-                        auto guestSetFlagsAction = GuestSetFlagsAction(peep->sprite_index, flags);
+                        auto guestSetFlagsAction = GuestSetFlagsAction(guest->sprite_index, flags);
                         GameActions::Execute(&guestSetFlagsAction);
                     }
                 }
