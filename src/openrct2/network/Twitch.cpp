@@ -391,7 +391,9 @@ namespace Twitch
             {
                 uint8_t args[32]{};
                 char buffer[256]{};
-                guest->FormatNameTo(args);
+                Formatter ft(args);
+
+                guest->FormatNameTo(ft);
                 format_string(buffer, sizeof(buffer), STR_STRINGID, args);
 
                 AudienceMember* member = nullptr;
