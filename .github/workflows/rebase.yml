@@ -1,4 +1,4 @@
-name: Auto rebase with upstream
+name: Rebase
 on:
   schedule:
     - cron:  '0 * * * *'
