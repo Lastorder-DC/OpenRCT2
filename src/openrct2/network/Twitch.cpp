@@ -385,7 +385,7 @@ namespace Twitch
     static void ManageGuestNames(std::vector<AudienceMember>& members)
     {
         // Check what followers are already in the park
-        for (auto guest : EntityList<Guest>(SPRITE_LIST_PEEP))
+        for (auto guest : EntityList<Guest>(EntityListId::Peep))
         {
             if (guest->Name != nullptr)
             {
@@ -455,7 +455,7 @@ namespace Twitch
         if (!members.empty())
         {
             size_t memberIndex = SIZE_MAX;
-            for (auto guest : EntityList<Guest>(SPRITE_LIST_PEEP))
+            for (auto guest : EntityList<Guest>(EntityListId::Peep))
             {
                 size_t originalMemberIndex = memberIndex;
                 for (size_t i = memberIndex + 1; i < members.size(); i++)
