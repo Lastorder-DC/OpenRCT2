@@ -544,7 +544,7 @@ namespace Twitch
             safe_strcpy(buffer + 1, message, sizeof(buffer) - 1);
 
             utf8_remove_formatting(buffer, false);
-            news_item_add_to_queue_raw(News::ItemType::Blank, buffer, 0);
+            News::AddItemToQueue(News::ItemType::Blank, buffer, 0);
         }
     }
 } // namespace Twitch
