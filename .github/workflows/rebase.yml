@@ -34,10 +34,16 @@ jobs:
           git rebase upstream/develop
           if [[ $(git status -s) ]]; then
               echo "Possible conflict detected. cannot auto rebase."
-              exit 1
+              git diff > diff.txt
           else
               echo "Pushing changes..."
               git push --force
               echo "Complete"
+              echo "No conflict detected!" > diff.txt
           fi
           popd
+      - name: Upload diff file
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: "Rebase-diff"
+          path: diff.txt
