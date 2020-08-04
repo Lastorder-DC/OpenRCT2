@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: "Rebase-diff"
-          path: diff.txt
+          path: ./OpenRCT2/diff.txt
