@@ -29,6 +29,7 @@ jobs:
           git fetch upstream
           popd
       - name: Rebase and push
+        continue-on-error: true
         run: |
           pushd ./OpenRCT2
           git rebase upstream/develop
